@@ -8,15 +8,37 @@ fn handle_connection(mut stream: TcpStream) {
     let mut buffer = [0; 1024];
 
     stream.read(&mut buffer).unwrap();
-    let contents = fs::read_to_string("index.html").unwrap();
 
-    let response = format!(
-        "HTTP/1.1 200 OK {}\r\n\r\n{}",
-        contents.len(),
-        contents
-    );
-    stream.write(response.as_bytes()).unwrap();
-    stream.flush();
+    let get = b"GET / HTTP/1.1\r\n";
+
+    if buffer.starts_with(get) {
+        let contents = fs::read_to_string("index.html").unwrap();
+
+        let response = format!(
+            "HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}",
+            contents.len(),
+            contents
+        );
+        
+        stream.write(response.as_bytes()).unwrap();
+        stream.flush();
+
+    }
+    else {
+        let status_line = "HTTP/1.1 4040 NOT FOUND";
+        let contents = fs::read_to_string("404.html").unwrap();
+
+        let response = format!(
+            "{}\r\nContent-Length: {}\r\n\r\n{}",
+            status_line,
+            contents.len(),
+            contents
+        );
+        stream.write(response.as_bytes()).unwrap();
+        stream.flush();
+    }
+
+    
 
 }
 
