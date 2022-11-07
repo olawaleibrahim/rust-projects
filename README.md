@@ -2,4 +2,4 @@
 
 **A repository for my portfolio projects in Rust,**
 
-*to be updated...
+*to be updated...*
